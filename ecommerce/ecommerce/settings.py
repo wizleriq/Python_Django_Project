@@ -59,6 +59,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',  # or
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10, # Number o fproducts per page
 }
 
 TEMPLATES = [
@@ -130,3 +132,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+

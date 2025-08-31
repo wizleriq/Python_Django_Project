@@ -2,19 +2,7 @@ from .models import Product
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
-class ProductSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
-    class Meta:
-        model = Product
-        fields = '__all__'
-        read_only_fields = ["owner", "created_date"]
-        #This check if the fields are present i.e (name, price, stock_quantity)
-        extra_kwargs = {
-            'name' : {"required": True},
-            'price' : {"required": True},
-            'stock_quantity': {"required": True}
-        }
-
+# If You Want To Display Just The Owners Name and ID Use The Code Below
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     class Meta:
@@ -28,10 +16,33 @@ class UserSerializer(serializers.ModelSerializer):
         password = validated_data['password']
     )
       return user
-        
-# Use create_user so password is hashed automatically
     
-        # Validate_<fieldname> (self, value):
+class ProductSerializer(serializers.ModelSerializer):
+    owner = UserSerializer(read_only=True)  # nested serializer
+    # owner = serializers.ReadOnlyField(source='owner.username')
+    class Meta:
+        model = Product
+        # fields = '__all__'
+        fields = [
+            "id",
+            "name",
+            "description",
+            "price",
+            "category",
+            "stock_quantity",
+            "image_url",
+            "created_date",
+            "owner",
+        ]
+        read_only_fields = ["owner", "created_date"]
+        #This check if the fields are present i.e (name, price, stock_quantity)
+        extra_kwargs = {
+            'name' : {"required": True},
+            'price' : {"required": True},
+            'stock_quantity': {"required": True}
+        }        
+
+    # Validate_<fieldname> (self, value):
     # Field validations
     def validate_price(self, value):
         if value <= 0:
@@ -42,6 +53,56 @@ class UserSerializer(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError("Stock quantity cannot be negative.")
         return value
+    
+
+
+#     If You Want To Display Just The Owners Name, Use The Code Below
+# class ProductSerializer(serializers.ModelSerializer):
+#     # owner = UserSerializer(read_only=True)  # nested serializer
+#     owner = serializers.ReadOnlyField(source='owner.username')
+#     class Meta:
+#         model = Product
+#         fields = '__all__'
+#         read_only_fields = ["owner", "created_date"]
+#         #This check if the fields are present i.e (name, price, stock_quantity)
+#         extra_kwargs = {
+#             'name' : {"required": True},
+#             'price' : {"required": True},
+#             'stock_quantity': {"required": True}
+#         }        
+
+#     # Validate_<fieldname> (self, value):
+#     # Field validations
+#     def validate_price(self, value):
+#         if value <= 0:
+#             raise serializers.ValidationError("Price must be greater than 0.")
+#         return value
+
+#     def validate_stock_quantity(self, value):
+#         if value < 0:
+#             raise serializers.ValidationError("Stock quantity cannot be negative.")
+#         return value
+
+    
+# Use create_user so password is hashed automatically
+# class UserSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(write_only=True)
+#     class Meta:
+#         model = User
+#         fields = ['id', 'username', 'email', 'password']
+    
+#     def create(self, validated_data):
+#       user = User.objects.create_user(
+#         username = validated_data["username"],
+#         email = validated_data.get('email'),
+#         password = validated_data['password']
+#     )
+#       return user
+    
+
+
+
+
 
 #         extra_kwargs = { "field": {"required": True} }
 
